@@ -7,6 +7,9 @@ import com.alex.rmmservicesserverapp.repository.CustomerRepository;
 import com.alex.rmmservicesserverapp.repository.CustomerServiceRepository;
 import com.alex.rmmservicesserverapp.repository.DeviceRepository;
 import com.alex.rmmservicesserverapp.repository.ServiceEntityRepository;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -30,6 +33,11 @@ public class CustomerController {
     @Autowired
     CustomerServiceRepository customerServiceRepository;
 
+    @Operation(summary = "Get all customers with their devices")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Customers found"),
+            @ApiResponse(responseCode = "204", description = "There are no customers")
+    })
     @GetMapping("/customers")
     public ResponseEntity<List<Customer>> getAllCustomers(){
 
@@ -43,6 +51,12 @@ public class CustomerController {
 
     }
 
+    @Operation(summary = "Get devices from specific user")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Devices found"),
+            @ApiResponse(responseCode = "404", description = "Customer not found"),
+            @ApiResponse(responseCode = "204", description = "No device was found for user")
+    })
     @GetMapping("/customer/{id}/devices")
     public ResponseEntity<List<Device>> getDevicesByUserId(@PathVariable int id){
 
@@ -63,6 +77,12 @@ public class CustomerController {
 
     }
 
+    @Operation(summary = "Add a device for a user")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Devices created"),
+            @ApiResponse(responseCode = "404", description = "Customer not found"),
+            @ApiResponse(responseCode = "500", description = "Device could not be created")
+    })
     @PostMapping("/customer/{id}/device")
     public ResponseEntity<Device> addUserDevice(@PathVariable int id, @RequestBody Device device){
 
@@ -84,12 +104,18 @@ public class CustomerController {
         }
 
         if(created)
-            return new ResponseEntity<>(device,HttpStatus.OK);
+            return new ResponseEntity<>(device,HttpStatus.CREATED);
         else
             return new ResponseEntity<>(device,HttpStatus.INTERNAL_SERVER_ERROR);
 
     }
 
+    @Operation(summary = "Update a user's device")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Devices updated"),
+            @ApiResponse(responseCode = "404", description = "Customer or device not found"),
+            @ApiResponse(responseCode = "500", description = "Device could not be updated")
+    })
     @PutMapping("/customer/{id}/device/{deviceId}")
     public ResponseEntity<Device> updateUserDevice(@PathVariable int id,@PathVariable int deviceId, @RequestBody Device device){
 
@@ -131,6 +157,12 @@ public class CustomerController {
 
     }
 
+    @Operation(summary = "Delete a user's device")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Device deleted"),
+            @ApiResponse(responseCode = "404", description = "Customer or device not found"),
+            @ApiResponse(responseCode = "500", description = "Device could not be deleted")
+    })
     @DeleteMapping("/customer/{id}/device/{deviceId}")
     public ResponseEntity<Device> deleteUserDevice(@PathVariable int id,@PathVariable int deviceId){
 
@@ -167,6 +199,12 @@ public class CustomerController {
 
     }
 
+    @Operation(summary = "Get services from specific user")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Services found"),
+            @ApiResponse(responseCode = "404", description = "Customer not found"),
+            @ApiResponse(responseCode = "204", description = "No services for specific user")
+    })
     @GetMapping("/customer/{id}/services")
     public ResponseEntity<List<ServiceEntity>> getAllServicesByUserId(@PathVariable int id){
 
@@ -204,6 +242,12 @@ public class CustomerController {
         }
     }
 
+    @Operation(summary = "Add a service for a user")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Service created"),
+            @ApiResponse(responseCode = "404", description = "Customer or device not found"),
+            @ApiResponse(responseCode = "412", description = "Service can not be asigned more than once")
+    })
     @PostMapping("/customer/{id}/service/{serviceId}")
     public ResponseEntity<CustomerService> addServiceByUserId(@PathVariable int id, @PathVariable int serviceId ){
 
@@ -222,7 +266,7 @@ public class CustomerController {
             if(customerServiceList.isEmpty()){
                 CustomerService customerService = new CustomerService(customer,service);
                 customerServiceRepository.save(customerService);
-                return new ResponseEntity<>(customerService,HttpStatus.OK);
+                return new ResponseEntity<>(customerService,HttpStatus.CREATED);
             }else{
                 return new ResponseEntity<>(HttpStatus.PRECONDITION_FAILED);
             }
@@ -233,6 +277,12 @@ public class CustomerController {
 
     }
 
+    @Operation(summary = "Delete a user's service")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Service deleted"),
+            @ApiResponse(responseCode = "404", description = "Customer or service not found"),
+            @ApiResponse(responseCode = "500", description = "Service could not be deleted")
+    })
     @DeleteMapping("/customer/{id}/service/{serviceId}")
     public ResponseEntity<CustomerService> deleteServiceByUserId(@PathVariable int id, @PathVariable int serviceId ){
 
@@ -269,6 +319,12 @@ public class CustomerController {
 
     }
 
+    @Operation(summary = "Get bill from user's service and devices")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Bill calculated"),
+            @ApiResponse(responseCode = "404", description = "Customer not found"),
+            @ApiResponse(responseCode = "500", description = "Bill could not be calculated")
+    })
     @GetMapping("/customer/{id}/bill")
     public ResponseEntity<Bill> getBillByUserId(@PathVariable int id ){
 

@@ -42,5 +42,4 @@ Postgresql 13 </br>
 <b>EndPoints :</b> </br>
 http://localhost:8080/swagger-ui/index.html?configUrl=/v3/api-docs/swagger-config
 
-![endpointsV1](https://user-images.githubusercontent.com/20358517/129458966-6aca4671-e1c8-468f-a76c-940511414a85.JPG)
-
+![endpointsV2](https://user-images.githubusercontent.com/20358517/129461767-47ca6b87-bbd9-4bf1-b3d6-002f040327a6.JPG)
